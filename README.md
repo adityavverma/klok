@@ -3,7 +3,7 @@
 **Free, open-source macOS menu bar clock with calendar, world clocks, and upcoming events. No Xcode required.**
 
 <p align="center">
-  <a href="https://github.com/adityavverma/klok/releases/latest/download/Klok.zip">
+  <a href="https://github.com/adityavverma/klok/releases/latest/download/Klok.dmg">
     <img src="https://img.shields.io/badge/Download_for_macOS-black?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" />
   </a>
 </p>
@@ -57,15 +57,17 @@ xcode-select --install
 
 ### Option 1 — One-click download (easiest)
 
-1. Click the **Download for macOS** button above (or [download Klok.zip](https://github.com/adityavverma/klok/releases/latest/download/Klok.zip))
-2. Unzip and drag **Klok.app** to your `/Applications` folder
-3. Run this once in Terminal to allow the app to open:
-   ```bash
-   xattr -cr /Applications/Klok.app
-   ```
-4. Open **Klok.app** — it appears in your menu bar instantly
+1. Click the **Download for macOS** button above (or [download Klok.dmg](https://github.com/adityavverma/klok/releases/latest/download/Klok.dmg))
+2. Open the DMG and drag **Klok.app** into the **Applications** folder shortcut
+3. Eject the DMG, then open **Klok.app** — it appears in your menu bar instantly
 
-> **Why the Terminal step?** macOS quarantines apps that aren't from the App Store. The `xattr -cr` command removes that restriction. You only need to do this once.
+> **Seeing "Klok is damaged and can't be opened"?**
+> This is a macOS Gatekeeper warning for apps not distributed via the App Store — the app is not actually damaged.
+> Open Terminal and run:
+> ```bash
+> xattr -cr /Applications/Klok.app
+> ```
+> Then try opening again. You only need to do this once.
 
 ### Option 2 — Build from source
 
