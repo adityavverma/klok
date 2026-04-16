@@ -17,6 +17,15 @@ struct AppSettings {
         get { UserDefaults.standard.object(forKey: "showDate") as? Bool ?? true }
         set { set("showDate", newValue) }
     }
+    // "auto" = Date & Time (respects showDate), "timeOnly", "dateOnly", "custom"
+    static var menuBarDisplayMode: String {
+        get { UserDefaults.standard.string(forKey: "menuBarDisplayMode") ?? "auto" }
+        set { set("menuBarDisplayMode", newValue) }
+    }
+    static var menuBarCustomFormat: String {
+        get { UserDefaults.standard.string(forKey: "menuBarCustomFormat") ?? "EEE d MMM  HH:mm" }
+        set { set("menuBarCustomFormat", newValue) }
+    }
     static var use24HourFormat: Bool {
         get { UserDefaults.standard.bool(forKey: "use24HourFormat") }
         set { set("use24HourFormat", newValue) }

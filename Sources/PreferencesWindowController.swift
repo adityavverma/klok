@@ -33,8 +33,6 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         v.loadViewIfNeeded()
 
         v.addSection("Menu Bar")
-        v.addCheckbox("Show date (e.g. Wed 16 Apr)",
-                      key: \.showDate, initial: AppSettings.showDate)
         v.addCheckbox("Use 24-hour format",
                       key: \.use24HourFormat, initial: AppSettings.use24HourFormat)
         v.addCheckbox("Show seconds",
@@ -43,6 +41,66 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
                       key: \.showSecondaryInMenuBar, initial: AppSettings.showSecondaryInMenuBar)
         v.addCheckbox("Show next calendar event in menu bar",
                       key: \.showNextEventInMenuBar, initial: AppSettings.showNextEventInMenuBar)
+
+        v.addSection("Display Format")
+
+        // Custom format text field — created first so popup handler can reference it
+        let customField = NSTextField()
+        customField.placeholderString = "e.g. EEE d MMM  HH:mm"
+        customField.stringValue = AppSettings.menuBarCustomFormat
+        customField.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+        customField.isEnabled = AppSettings.menuBarDisplayMode == "custom"
+        customField.translatesAutoresizingMaskIntoConstraints = false
+
+        // Mode popup
+        let modeOptions: [(String, String)] = [
+            ("Date & Time", "auto"),
+            ("Time Only",   "timeOnly"),
+            ("Date Only",   "dateOnly"),
+            ("Custom",      "custom")
+        ]
+        let modePopup = NSPopUpButton()
+        for (title, _) in modeOptions { modePopup.addItem(withTitle: title) }
+        if let idx = modeOptions.firstIndex(where: { $0.1 == AppSettings.menuBarDisplayMode }) {
+            modePopup.selectItem(at: idx)
+        }
+        let modeHandler = MenuBarModeHandler(options: modeOptions, customField: customField)
+        modePopup.target = modeHandler
+        modePopup.action = #selector(MenuBarModeHandler.changed(_:))
+        withUnsafePointer(to: &AssocKey.proxyKey) { ptr in
+            objc_setAssociatedObject(modePopup, ptr, modeHandler, .OBJC_ASSOCIATION_RETAIN)
+        }
+
+        let modeRow = NSStackView()
+        modeRow.orientation = .horizontal; modeRow.spacing = 8; modeRow.alignment = .centerY
+        let modeLbl = NSTextField(labelWithString: "Format:")
+        modeLbl.font = NSFont.systemFont(ofSize: 13)
+        modeRow.addArrangedSubview(modeLbl)
+        modeRow.addArrangedSubview(modePopup)
+        v.stackView.addArrangedSubview(modeRow)
+
+        // Custom format row
+        let fmtHandler = CustomFormatHandler()
+        customField.delegate = fmtHandler
+        withUnsafePointer(to: &AssocKey.proxyKey) { ptr in
+            objc_setAssociatedObject(customField, ptr, fmtHandler, .OBJC_ASSOCIATION_RETAIN)
+        }
+
+        let fmtRow = NSStackView()
+        fmtRow.orientation = .horizontal; fmtRow.spacing = 8; fmtRow.alignment = .centerY
+        let fmtLbl = NSTextField(labelWithString: "Pattern:")
+        fmtLbl.font = NSFont.systemFont(ofSize: 13)
+        fmtRow.addArrangedSubview(fmtLbl)
+        fmtRow.addArrangedSubview(customField)
+        customField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200).isActive = true
+        v.stackView.addArrangedSubview(fmtRow)
+
+        // Hint
+        let hint = NSTextField(labelWithString: "Tokens: EEE=weekday  d=day  MMM=month  HH:mm=24h  h:mm a=12h  ss=seconds")
+        hint.font = NSFont.systemFont(ofSize: 10)
+        hint.textColor = .tertiaryLabelColor
+        hint.lineBreakMode = .byWordWrapping
+        v.stackView.addArrangedSubview(hint)
 
         return v
     }
@@ -95,7 +153,7 @@ extension NSTabViewController {
 
 class FormViewController: NSViewController {
     private var scrollView: NSScrollView!
-    private var stackView: NSStackView!
+    var stackView: NSStackView!
     private let titleStr: String
 
     init(title: String) {
@@ -218,6 +276,37 @@ class AppSettingsProxy: NSObject {
 
 private enum AssocKey {
     static var proxyKey: UInt8 = 0
+}
+
+// MARK: - Display mode helpers
+
+private class MenuBarModeHandler: NSObject {
+    private let options: [(String, String)]
+    private weak var customField: NSTextField?
+
+    init(options: [(String, String)], customField: NSTextField) {
+        self.options = options
+        self.customField = customField
+    }
+
+    @objc func changed(_ sender: NSPopUpButton) {
+        let idx = sender.indexOfSelectedItem
+        guard idx >= 0 && idx < options.count else { return }
+        let val = options[idx].1
+        AppSettings.menuBarDisplayMode = val
+        customField?.isEnabled = val == "custom"
+    }
+}
+
+private class CustomFormatHandler: NSObject, NSTextFieldDelegate {
+    func controlTextDidChange(_ obj: Notification) {
+        guard let tf = obj.object as? NSTextField else { return }
+        AppSettings.menuBarCustomFormat = tf.stringValue
+    }
+    func controlTextDidEndEditing(_ obj: Notification) {
+        guard let tf = obj.object as? NSTextField else { return }
+        AppSettings.menuBarCustomFormat = tf.stringValue
+    }
 }
 
 // MARK: - Clocks Tab

@@ -115,7 +115,21 @@ class StatusBarController: NSObject {
     }
 
     private func formatLocalTime(_ date: Date) -> String {
-        return formatTime(date, timezone: AppSettings.primaryTimezone, includeDate: AppSettings.showDate)
+        let tz = AppSettings.primaryTimezone
+        switch AppSettings.menuBarDisplayMode {
+        case "timeOnly":
+            return formatTime(date, timezone: tz, includeDate: false)
+        case "dateOnly":
+            let f = DateFormatter(); f.timeZone = tz; f.dateFormat = "EEE d MMM"
+            return f.string(from: date)
+        case "custom":
+            let f = DateFormatter(); f.timeZone = tz
+            let fmt = AppSettings.menuBarCustomFormat
+            f.dateFormat = fmt.isEmpty ? "HH:mm" : fmt
+            return f.string(from: date)
+        default:
+            return formatTime(date, timezone: tz, includeDate: AppSettings.showDate)
+        }
     }
 
     func formatTime(_ date: Date, timezone: TimeZone, includeDate: Bool) -> String {
