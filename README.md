@@ -1,59 +1,61 @@
-# Klok
+# Klok — macOS Menu Bar Clock App
 
-A lightweight macOS menu bar clock app inspired by [Dato](https://sindresorhus.com/dato). Shows the time, a monthly calendar, upcoming calendar events, and world clocks — all in a clean popover. No Xcode required to build.
+**Free, open-source macOS menu bar clock with calendar, world clocks, and upcoming events. No Xcode required.**
 
-![Klok menu bar popover](https://github.com/adityavverma/klok/raw/main/Resources/AppIcon.png)
+![Klok App Icon](https://github.com/adityavverma/klok/raw/main/Resources/AppIcon.png)
+
+---
+
+## What is Klok?
+
+Klok is a **macOS menu bar clock app** that replaces or extends the default system clock. It shows the current time in your menu bar and opens a popover with a full **monthly calendar**, **upcoming calendar events**, and **world clocks** for multiple timezones — all with zero battery impact.
+
+Built entirely in Swift with AppKit. No Xcode IDE needed to build and run.
 
 ---
 
 ## Features
 
-- **Menu bar clock** — date, time, seconds, 12/24h format
-- **Primary timezone** — set any timezone as your main clock (defaults to system)
-- **Secondary clocks in menu bar** — show up to 2 extra timezones alongside the main clock
-- **Month calendar** — with week numbers, weekend highlighting, and colored event dots
-- **Upcoming events** — next 3 events from your calendars with countdown and video call detection
-- **World clocks panel** — city name, time, UTC offset, day/night icon, relative day (Today/Tomorrow)
-- **Preferences window** — General, Clocks, Calendar, and Events tabs
-- **App Nap prevention** — clock never freezes or vanishes from the menu bar
-- **Near-zero battery impact** — safe to run 24/7
+- **Menu bar clock** — live time with date, seconds, 12h/24h format
+- **Custom primary timezone** — display any timezone as your main clock
+- **Multiple timezones in menu bar** — show up to 2 extra timezone clocks side by side
+- **Monthly calendar** — full month grid with week numbers, weekend highlighting, and colored event dots per day
+- **Upcoming events** — shows next 3 events from Apple Calendar with countdown timer and video call detection (Zoom, Google Meet, Teams)
+- **World clocks** — time, UTC offset, day/night icon, and relative day label (Today / Tomorrow) for any city
+- **Next event in menu bar** — see your next meeting without opening anything
+- **Preferences** — full settings window with General, Clocks, Calendar, and Events tabs
+- **Always-on** — never freezes, never vanishes from the menu bar
+- **Lightweight** — near-zero CPU and battery usage, safe to run 24/7
 
 ---
 
 ## Requirements
 
-- macOS 13 Ventura or later
-- Xcode Command Line Tools (`xcode-select --install`)
+- macOS 13 Ventura or later (works on Sonoma and Sequoia)
+- Xcode Command Line Tools only — no full Xcode install needed
 
-No third-party dependencies. No Xcode IDE needed.
+```bash
+xcode-select --install
+```
 
 ---
 
-## Installation
+## Install
 
-### Option 1 — Build from source (recommended)
+### Build from source
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/adityavverma/klok.git
 cd klok
-
-# 2. Build
 bash build.sh
-
-# 3. Install to Applications
 cp -r Klok.app /Applications/
-
-# 4. Remove macOS quarantine flag (required for apps not from the App Store)
 xattr -cr /Applications/Klok.app
-
-# 5. Launch
 open /Applications/Klok.app
 ```
 
-Klok will appear in your menu bar immediately.
+Klok will appear in your menu bar instantly.
 
-### Option 2 — Run without installing
+### Run without installing
 
 ```bash
 git clone https://github.com/adityavverma/klok.git
@@ -63,73 +65,66 @@ xattr -cr Klok.app
 open Klok.app
 ```
 
+> **Why `xattr -cr`?** macOS quarantines apps downloaded from the internet or built outside the App Store. This command removes that flag so the app can run.
+
 ---
 
-## Auto-start on login
+## Auto-start on Login
 
-1. Open **System Settings → General → Login Items**
-2. Click **+** and select `/Applications/Klok.app`
+To launch Klok automatically when your Mac starts:
+
+1. **System Settings → General → Login Items**
+2. Click **+** and choose `/Applications/Klok.app`
 
 ---
 
 ## Usage
 
-**Click** the menu bar clock to open the popover.
-
-**Right-click** the menu bar clock for a quick menu (Preferences, Quit).
-
-Inside the popover:
-- **`‹` / `›`** arrows navigate months
-- **Today** button (appears when you've navigated away) jumps back to current month
-- **`···`** button → Preferences or Quit
-- **`>`** button → opens Calendar.app
+| Action | Result |
+|--------|--------|
+| Click menu bar clock | Opens the popover |
+| Right-click menu bar clock | Quick menu (Preferences, Quit) |
+| `‹` / `›` in popover | Navigate months |
+| **Today** button | Jump back to current month |
+| `···` button | Preferences or Quit |
+| `>` button | Open Apple Calendar |
 
 ### Preferences
 
-Open via `···` → Preferences, or right-click the menu bar icon.
-
-| Tab | Options |
-|-----|---------|
-| **General** | Show date, 24h format, seconds, secondary timezones in menu bar, next event in menu bar |
-| **Clocks** | Primary timezone, secondary menu bar clocks (up to 2), world clocks shown in popover |
-| **Calendar** | Week starts on Monday, week numbers, highlight weekends, event dots |
-| **Events** | Show upcoming events, enable/disable individual calendars |
+| Tab | What you can configure |
+|-----|------------------------|
+| **General** | Date display, 12h/24h, seconds, secondary timezones in menu bar, next event in menu bar |
+| **Clocks** | Primary timezone, up to 2 secondary menu bar clocks, world clocks list |
+| **Calendar** | Week start day, week numbers, weekend highlighting, event dots |
+| **Events** | Toggle upcoming events panel, enable/disable individual calendars |
 
 ---
 
-## Calendar Access
+## Calendar & Events Access
 
-On first launch, Klok will request access to your calendars. This is used to:
-- Show colored event dots on the calendar grid
+Klok asks for calendar permission on first launch to:
+- Show colored dots on days that have events
 - Display upcoming events in the popover
-- Show the next event in the menu bar
+- Show your next event in the menu bar
 
-You can grant or revoke access at any time in **System Settings → Privacy & Security → Calendars**.
+Manage permissions anytime: **System Settings → Privacy & Security → Calendars**
 
 ---
 
-## Building
+## Building & Development
 
-The build script compiles all Swift sources in `Sources/` using `swiftc` and packages them into a standard `.app` bundle:
+The `build.sh` script compiles all Swift source files and packages them into a standard macOS `.app` bundle using `swiftc` — no Xcode project file, no SPM, no dependencies.
 
 ```
 Klok.app/
 └── Contents/
     ├── Info.plist
     ├── PkgInfo
-    ├── MacOS/
-    │   └── Klok          ← compiled binary
-    └── Resources/
-        └── AppIcon.icns
+    ├── MacOS/Klok          ← compiled binary
+    └── Resources/AppIcon.icns
 ```
 
-To rebuild after making changes:
-
-```bash
-bash build.sh && cp -r Klok.app /Applications/ && xattr -cr /Applications/Klok.app
-```
-
-If the app is already running, quit it first (`···` → Quit Klok) or:
+**Rebuild and reinstall in one line:**
 
 ```bash
 pkill -x Klok; bash build.sh && cp -r Klok.app /Applications/ && xattr -cr /Applications/Klok.app && open /Applications/Klok.app
@@ -141,23 +136,29 @@ pkill -x Klok; bash build.sh && cp -r Klok.app /Applications/ && xattr -cr /Appl
 
 ```
 klok/
-├── build.sh                          # Build script (no Xcode needed)
+├── build.sh
 ├── Resources/
-│   ├── Info.plist                    # App bundle metadata
-│   ├── AppIcon.icns                  # App icon (all sizes)
-│   └── AppIcon.png                   # Source icon (2048×2048)
+│   ├── Info.plist
+│   ├── AppIcon.icns
+│   └── AppIcon.png
 └── Sources/
-    ├── main.swift                    # Entry point
-    ├── AppDelegate.swift             # App Nap prevention
-    ├── AppSettings.swift             # UserDefaults-backed settings
-    ├── StatusBarController.swift     # Menu bar item, timer, popover
-    ├── PopoverViewController.swift   # Popover layout and sections
-    ├── CalendarView.swift            # Month calendar grid + DayCell
-    ├── WorldClocksView.swift         # World clocks rows
-    ├── UpcomingEventsView.swift      # Upcoming events list
-    ├── PreferencesWindowController.swift  # Preferences UI
-    └── EventManager.swift            # EventKit wrapper
+    ├── main.swift                         # Entry point
+    ├── AppDelegate.swift                  # Prevents App Nap
+    ├── AppSettings.swift                  # All settings via UserDefaults
+    ├── StatusBarController.swift          # Menu bar item, 1s timer, popover
+    ├── PopoverViewController.swift        # Popover layout
+    ├── CalendarView.swift                 # Monthly calendar grid
+    ├── WorldClocksView.swift              # World clock rows
+    ├── UpcomingEventsView.swift           # Upcoming events list
+    ├── PreferencesWindowController.swift  # Settings UI
+    └── EventManager.swift                 # EventKit / Apple Calendar wrapper
 ```
+
+---
+
+## Keywords
+
+macOS menu bar clock · macOS world clock app · macOS calendar menu bar · macOS timezone clock · macOS status bar clock · macOS upcoming events menu bar · macOS clock app open source · Swift menu bar app · AppKit menu bar · macOS multiple timezones · macOS clock with calendar · free macOS clock app
 
 ---
 
