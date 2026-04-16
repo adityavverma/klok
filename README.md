@@ -8,6 +8,12 @@
   </a>
 </p>
 
+<p align="center"><b>Or install in one line — no popups, no warnings:</b></p>
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/adityavverma/klok/main/install.sh | bash
+```
+
 <p align="center">
   <img src="https://img.shields.io/github/v/release/adityavverma/klok?label=latest&color=blue" />
   <img src="https://img.shields.io/badge/macOS-13%2B-brightgreen" />
@@ -55,19 +61,26 @@ xcode-select --install
 
 ## Install
 
-### Option 1 — One-click download (easiest)
+### Option 1 — Terminal installer (recommended, no warnings)
+
+Paste this in Terminal and press Enter. It downloads, installs, removes the quarantine flag, and launches Klok automatically:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/adityavverma/klok/main/install.sh | bash
+```
+
+### Option 2 — DMG download
 
 1. Click the **Download for macOS** button above (or [download Klok.dmg](https://github.com/adityavverma/klok/releases/latest/download/Klok.dmg))
 2. Open the DMG and drag **Klok.app** into the **Applications** folder shortcut
-3. Eject the DMG, then open **Klok.app** — it appears in your menu bar instantly
+3. Eject the DMG
+4. If macOS says **"Klok is damaged"**, open Terminal and run:
+   ```bash
+   xattr -cr /Applications/Klok.app
+   ```
+5. Open **Klok.app** — it appears in your menu bar instantly
 
-> **Seeing "Klok is damaged and can't be opened"?**
-> This is a macOS Gatekeeper warning for apps not distributed via the App Store — the app is not actually damaged.
-> Open Terminal and run:
-> ```bash
-> xattr -cr /Applications/Klok.app
-> ```
-> Then try opening again. You only need to do this once.
+> This warning appears because Klok is not signed with an Apple Developer certificate. It is not actually damaged. The `xattr -cr` command removes the quarantine flag macOS applies to all downloaded files.
 
 ### Option 2 — Build from source
 
