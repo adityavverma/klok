@@ -2,6 +2,19 @@
 
 **Free, open-source macOS menu bar clock with calendar, world clocks, and upcoming events. No Xcode required.**
 
+<p align="center">
+  <a href="https://github.com/adityavverma/klok/releases/latest/download/Klok.zip">
+    <img src="https://img.shields.io/badge/Download_for_macOS-black?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/adityavverma/klok?label=latest&color=blue" />
+  <img src="https://img.shields.io/badge/macOS-13%2B-brightgreen" />
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" />
+  <img src="https://img.shields.io/badge/built%20with-Swift-orange?logo=swift" />
+</p>
+
 ![Klok App Icon](https://github.com/adityavverma/klok/raw/main/Resources/AppIcon.png)
 
 ---
@@ -42,7 +55,19 @@ xcode-select --install
 
 ## Install
 
-### Build from source
+### Option 1 — One-click download (easiest)
+
+1. Click the **Download for macOS** button above (or [download Klok.zip](https://github.com/adityavverma/klok/releases/latest/download/Klok.zip))
+2. Unzip and drag **Klok.app** to your `/Applications` folder
+3. Run this once in Terminal to allow the app to open:
+   ```bash
+   xattr -cr /Applications/Klok.app
+   ```
+4. Open **Klok.app** — it appears in your menu bar instantly
+
+> **Why the Terminal step?** macOS quarantines apps that aren't from the App Store. The `xattr -cr` command removes that restriction. You only need to do this once.
+
+### Option 2 — Build from source
 
 ```bash
 git clone https://github.com/adityavverma/klok.git
@@ -55,7 +80,7 @@ open /Applications/Klok.app
 
 Klok will appear in your menu bar instantly.
 
-### Run without installing
+### Option 3 — Run without installing
 
 ```bash
 git clone https://github.com/adityavverma/klok.git
