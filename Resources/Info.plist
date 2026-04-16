@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.klok.app</string>
+    <key>CFBundleName</key>
+    <string>Klok</string>
+    <key>CFBundleDisplayName</key>
+    <string>Klok</string>
+    <key>CFBundleExecutable</key>
+    <string>Klok</string>
+    <key>CFBundleVersion</key>
+    <string>2.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>2.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Klok shows your upcoming calendar events in the popover and menu bar.</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>Klok shows your upcoming calendar events in the popover and menu bar.</string>
+    <key>NSAppSleepDisabled</key>
+    <true/>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+    </dict>
+</dict>
+</plist>
