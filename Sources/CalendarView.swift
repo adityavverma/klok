@@ -23,16 +23,8 @@ class CalendarView: NSView {
         applyWeekStart()
         reloadEventColors()
         buildCalendar()
-        NotificationCenter.default.addObserver(self, selector: #selector(onSettings),
-                                               name: .settingsChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(onEvents),
-                                               name: .eventsChanged, object: nil)
     }
     required init?(coder: NSCoder) { fatalError() }
-    deinit { NotificationCenter.default.removeObserver(self) }
-
-    @objc private func onSettings() { applyWeekStart(); buildCalendar() }
-    @objc private func onEvents() { reloadEventColors(); buildCalendar() }
 
     func refresh() {
         today = cal.startOfDay(for: Date())

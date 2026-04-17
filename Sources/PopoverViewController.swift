@@ -22,6 +22,8 @@ class PopoverViewController: NSViewController {
     private var worldClocksView: WorldClocksView!
     private var joinBanner: JoinBannerView?
 
+    private var lastLayoutSize: CGSize = .zero
+
     override func loadView() {
         view = NSVisualEffectView(frame: .zero)
         (view as? NSVisualEffectView)?.blendingMode = .behindWindow
@@ -38,74 +40,71 @@ class PopoverViewController: NSViewController {
                                                name: .eventsChanged, object: nil)
     }
 
+    // Re-layout when the popover gives us a different frame than preferredContentSize.
+    // macOS 26 (Tahoe) liquid-glass chrome may add extra height — the calendar absorbs it.
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        let s = view.bounds.size
+        guard s.width > 0, s.height > 0, s != lastLayoutSize else { return }
+        lastLayoutSize = s
+        buildUI()
+    }
+
     deinit { NotificationCenter.default.removeObserver(self) }
 
-    @objc private func onSettingsOrEvents() { buildUI() }
+    @objc private func onSettingsOrEvents() {
+        lastLayoutSize = .zero   // force viewDidLayout to re-run after next resize
+        buildUI()
+    }
 
     private func buildUI() {
         view.subviews.forEach { $0.removeFromSuperview() }
 
-        // ── Compute heights ───────────────────────────────────────
-        let numClocks  = max(1, min(4, AppSettings.worldClockIdentifiers.count))
-        let clocksH    = CGFloat(numClocks) * clockRowH
+        // ── Fixed-height sections ────────────────────────────────
+        let numClocks = max(1, min(4, AppSettings.worldClockIdentifiers.count))
+        let clocksH   = CGFloat(numClocks) * clockRowH
 
         var eventsH: CGFloat = 0
-        var numEvents = 0
         if AppSettings.showUpcomingEvents {
-            numEvents  = min(3, EventManager.shared.upcomingEvents(days: 7, max: 3).count)
-            eventsH    = CGFloat(max(1, numEvents)) * eventRowH   // at least 1 row (for "no events" msg)
+            let n = min(3, EventManager.shared.upcomingEvents(days: 7, max: 3).count)
+            eventsH = CGFloat(max(1, n)) * eventRowH
         }
 
-        // Calendar: always allocate 6 rows so height is stable across months
-        let calH = calHeaderH + calWeekdayH + 6 * calCellH + 6   // +6 small padding
-
-        // Total height (bottom → top)
-        let totalH = bottomBarH + sepH
+        // Sum of all sections below the calendar
+        let fixedH = bottomBarH + sepH
                    + clocksH   + sepH
                    + (eventsH > 0 ? eventsH + sepH : 0)
-                   + calH
-                   + 8   // top padding
 
-        let H = totalH
-        view.frame             = NSRect(x: 0, y: 0, width: W, height: H)
-        preferredContentSize   = NSSize(width: W, height: H)
+        let minCalH = calHeaderH + calWeekdayH + 6 * calCellH + 6
+        let contentH = fixedH + minCalH + 8   // our ideal total height
 
-        // ── Build from bottom up ──────────────────────────────────
+        preferredContentSize = NSSize(width: W, height: contentH)
+
+        // If the system gave us more height (macOS 26 chrome), let the calendar grow.
+        // Bottom bar stays pinned at y=0; extra space ends up inside the calendar (below the grid).
+        let actualH = view.bounds.height > contentH ? view.bounds.height : contentH
+        let calH    = actualH - fixedH - 8    // calendar absorbs all remaining space
+        view.frame  = NSRect(x: 0, y: 0, width: W, height: actualH)
+
+        // ── Build from bottom up (y=0 always at visual bottom) ───
         var y: CGFloat = 0
 
-        // Bottom bar
-        let bar = buildBottomBar(y: y)
-        view.addSubview(bar)
-        y += bottomBarH
-
+        let bar = buildBottomBar(y: y); view.addSubview(bar);  y += bottomBarH
         addSep(at: y); y += sepH
 
-        // World clocks
-        worldClocksView = WorldClocksView(
-            frame: NSRect(x: 0, y: y, width: W, height: clocksH))
-        view.addSubview(worldClocksView)
-        y += clocksH
-
+        worldClocksView = WorldClocksView(frame: NSRect(x: 0, y: y, width: W, height: clocksH))
+        view.addSubview(worldClocksView);  y += clocksH
         addSep(at: y); y += sepH
 
-        // Upcoming events
         if eventsH > 0 {
-            eventsView = UpcomingEventsView(
-                frame: NSRect(x: 0, y: y, width: W, height: eventsH))
-            view.addSubview(eventsView)
-            y += eventsH
+            eventsView = UpcomingEventsView(frame: NSRect(x: 0, y: y, width: W, height: eventsH))
+            view.addSubview(eventsView);  y += eventsH
             addSep(at: y); y += sepH
         }
 
-        // Calendar (fills remaining space exactly)
-        calendarView = CalendarView(
-            frame: NSRect(x: 0, y: y, width: W, height: calH))
+        calendarView = CalendarView(frame: NSRect(x: 0, y: y, width: W, height: calH))
         view.addSubview(calendarView)
-        y += calH
 
-        // top padding already accounted in totalH
-
-        // Join banner (overlaid at top when meeting is imminent)
         refreshJoinBanner()
     }
 

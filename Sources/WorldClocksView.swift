@@ -9,13 +9,8 @@ class WorldClocksView: NSView {
     override init(frame: NSRect) {
         super.init(frame: frame)
         buildRows()
-        NotificationCenter.default.addObserver(self, selector: #selector(onSettings),
-                                               name: .settingsChanged, object: nil)
     }
     required init?(coder: NSCoder) { fatalError() }
-    deinit { NotificationCenter.default.removeObserver(self) }
-
-    @objc private func onSettings() { buildRows() }
 
     func buildRows() {
         subviews.forEach { $0.removeFromSuperview() }
